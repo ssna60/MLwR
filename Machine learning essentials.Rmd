@@ -1,0 +1,3084 @@
+---
+title: "mle+++"
+author: "saber"
+date: "2022-12-13"
+output: pdf_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+
+```
+
+#Part I: Basics
+#Chapter1: Introduction to R
+
+```{r}
+mypkgs <- c("tidyverse", "caret")
+install.packages (mypkgs)
+library("tidyverse")
+library("caret")
+```
+
+
+# Reads tab delimited files (.txt tab)
+
+```{r}
+my_data<-read.delim(file.choose())
+```
+
+
+#Reads comma (,)delimited files(.csv)
+
+```{r}
+my_data<-read.csv(file.choose())
+```
+
+
+# Reads semicolon(;) separated files(.csv)
+
+```{r}
+my_data<-read.csv2(file.choose())
+data("iris") # Loading
+head(iris, n= 3) # Print the first n = 3 rows
+?iris
+```
+
+
+#-------------------------------------------------------------------------------
+#Part II: Regression Analysis
+#Chapter2:Introduction
+
+```{r}
+if (!require(devtools)) install.packagee("devtools")
+devtools:: install_github("kassambara/datarium")
+data("marketing", package = "datarium")
+head (marketing, 3)
+data("swiss")
+head(swiss, 3)
+data ("Boston" , package = "MASS")
+head(Boston, 3)
+```
+
+
+#-------------------------------------------------------------------------------
+# Chapter3: Linear Regression
+## Introduction
+
+Linear regression (or linear model) is used to predict a quantitative outcome variable (y) on the basis of one or multiple predictor variables (x) (James et al., 2014, Bruce and Bruce (2017)).
+The goal is to build a mathematical formula that defines y as a function of the x variable. Once, we built a statistically significant model, it’s possible to use it for predicting future outcome on the basis of new x values.
+When you build a regression model, you need to assess the performance of the predictive model. In other words, you need to evaluate how well the model is in predicting the outcome of a new test data that have not been used to build the model.
+Two important metrics are commonly used to assess the performance of the predictive regression model:
+•	Root Mean Squared Error, which measures the model prediction error. It corre¬sponds to the average difference between the observed known values of the outcome and the predicted value by the model. RMSE is computed as RMSE = mean((observeds - predicteds)~2) %>% sqrt(). The lower the RMSE, the better the model.
+•	R-square, representing the squared correlation between the observed known outcome values and the predicted values by the model. The higher the R2, the better the model.
+A simple workflow to build to build a predictive regression model is as follow:
+1.	Randomly split your data into training set (80%) and test set (20%)
+2.	Build the regression model using the training set
+3.	Make predictions using the test set and compute the model accuracy metrics
+In this chapter, you will learn:
+•	the basics and the formula of linear regression,
+•	how to compute simple and multiple regression models in R,
+•	how to make predictions of the outcome of new data,
+•	how to assess the performance of the model
+
+## Formula
+
+```{r}
+install.packages('tidyverse')
+library (tidyverse)
+library (caret)
+theme_set(theme_bw())
+```
+
+
+#Load the data
+
+```{r}
+data("marketing", package = "datarium")
+```
+
+
+# Inspect the data
+
+```{r}
+sample_n(marketing, 3)
+```
+
+
+
+```{r}
+
+```
+
+# Split the data into training and test set
+```{r}
+
+```
+set.seed(123)
+training.samples <- marketing$sales %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data <- marketing[training.samples, ]
+test.data <- marketing[-training.samples, ]
+
+```{r}
+
+```
+
+# Build the model
+
+```{r}
+
+```
+
+model <- lm(sales ~., data = train.data)
+# Summarize the model
+
+```{r}
+
+```
+
+summary(model)
+# make predictions
+
+```{r}
+
+```
+
+predictions <- model %>%  predict(test.data)
+# model performance
+# (a) Prediction error, RMSE
+
+```{r}
+
+```
+
+RMSE(predictions, test.data$sales)
+# (b) R-square
+```{r}
+
+```
+R2(predictions, test.data$sales)
+
+model <- lm(sales ~ youtube, data = train.data)
+summary (model)$coef
+newdata <- data.frame( youtube = c (0 , 1000))
+model %>% predict(newdata)
+
+model <- lm(sales ~ youtube + facebook + newspaper,data = train.data)
+summary (model)$coef
+
+model <- lm(sales ~.,data = train.data)
+summary (model)$coef
+
+```{r}
+
+```
+# new advertising budgets
+```{r}
+
+```
+newdata <- data.frame(
+  youtube = 2000, facebook = 1000,
+  newspaper = 1000
+)
+# Predict sates values
+```{r}
+
+```
+model %>% predict(newdata)
+summary (model)
+summary (model)$coef
+model <- lm(sales ~ youtube + facebook,data = train.data)
+summary (model)
+
+# Make predictions
+```{r}
+
+```
+predictions <- model %>% predict(test.data)
+# Model performance
+```{r}
+
+```
+#(a) Compute the prediction error, RMSE
+```{r}
+
+```
+RMSE(predictions, test.data$sales)
+
+#(b) Compute R-square
+```{r}
+
+```
+R2(predictions, test.data$sales)
+
+ggplot (marketing, aes(x = youtube, y = sales)) + geom_point() + stat_smooth()
+#-------------------------------------------------------------------------------
+#Chapter4:Interaction Effects in Multiple Regression
+```{r}
+
+```
+library("tidyverse")
+library("caret")
+# Load the data
+```{r}
+
+```
+data("marketing", package = "datarium")
+# Inspect the data
+```{r}
+
+```
+sample_n(marketing, 3)
+# Split the data into training and test set
+```{r}
+
+```
+set.seed(123)
+training.samples <- marketing$sales %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data <- marketing[training.samples, ]
+test.data <- marketing[-training.samples, ]
+# Build the model
+```{r}
+
+```
+model <- lm(sales ~., data = train.data)
+# Summarize the model
+```{r}
+
+```
+summary(model)
+
+# make predictions
+
+```{r}
+
+```
+
+predictions <- model %>%  predict(test.data)
+# model performance
+# (a) Prediction error, RMSE
+
+```{r}
+
+```
+
+RMSE(predictions, test.data$sales)
+# (b) R-square
+
+```{r}
+
+```
+
+R2(predictions, test.data$sales)
+
+# Build the model
+# Use this:
+
+```{r}
+
+```
+
+model2 <- lm(sales ~ youtube + facebook +youtube:facebook,data = marketing)
+summary(model2)
+
+# or simply , use this:
+
+```{r}
+
+```
+
+model2 <- lm(sales ~ youtube*facebook, data = train.data)
+
+# Summarize the model
+
+```{r}
+
+```
+
+summary(model2)
+
+# Model performance
+# (a) Compute the prediction error, RMSE
+```{r}
+
+```
+
+RMSE(predictions, test.data$sales)
+
+#(b) Compute R-square
+
+```{r}
+
+```
+
+R2(predictions, test.data$sales)
+
+#-------------------------------------------------------------------------------
+#Chapter5: Regression with Categorical Variables
+
+```{r}
+
+```
+
+
+library(tidyverse)
+library(car)
+
+# Load the data
+
+```{r}
+
+```
+
+data("Salaries", package = "car")
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(Salaries, 3)
+
+#compute the model
+
+```{r}
+
+```
+
+model <- lm(salary ~ sex ,data = Salaries)
+summary (model)$coef
+
+contrasts(Salaries$sex)
+Salaries <- Salaries %>% 
+  mutate(sex = relevel(sex, ref = "Male"))
+contrasts(Salaries$sex)
+
+#Salaries$sex <- relevel(Salaries$sex, ref = "Male")
+
+
+#contrasts(Salaries$rank)
+#Salaries <- Salaries %>% 
+#  mutate(rank = relevel(rank, ref = "AssocProf"))
+
+```{r}
+
+```
+
+model <- lm(salary ~ sex ,data = Salaries)
+summary (model)$coef
+
+res <- model.matrix(~rank, data = Salaries)
+head(res[, -1])
+
+library(car)
+model2 <- lm(salary ~ yrs.service + rank + discipline + sex, data = Salaries)
+Anova(model2)
+summary (model2)
+
+#-------------------------------------------------------------------------------
+#Chapter6: Nonlinear Regression
+
+```{r}
+
+```
+
+library("tidyverse")
+library("caret")
+theme_set(theme_classic())
+
+#Load the data
+
+```{r}
+
+```
+
+data("Boston", package = "MASS")
+
+# Split the data into training and test set
+
+```{r}
+
+```
+
+set.seed(123)
+training.samples <- Boston$medv %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data <- Boston[training.samples, ]
+test.data <- Boston[-training.samples, ]
+ggplot (train.data, aes(x = lstat,medv)) + geom_point() + stat_smooth()
+
+# Build the model
+
+```{r}
+
+```
+
+model <- lm(medv ~ lstat, data = train.data)
+
+# make predictions
+
+```{r}
+
+```
+
+predictions <- model %>%  predict(test.data)
+
+# model performance
+
+```{r}
+
+```
+
+data.frame(
+  RMSE = RMSE(predictions, test.data$medv),
+  R2 = R2(predictions, test.data$medv)
+)
+ggplot (train.data, aes(lstat,medv)) + geom_point() + stat_smooth(method = lm, formula = y ~ x)
+
+lm(medv ~ lstat + I(lstat^2), data = train.data)
+lm(medv ~ poly(lstat, 2), data = train.data) #?
+
+lm(medv ~ poly(lstat, 6), data = train.data) %>%
+  summary ()
+
+# Build the model
+
+```{r}
+
+```
+
+model <- lm(medv ~ poly(lstat, 5), data = train.data)
+
+# make predictions
+
+```{r}
+
+```
+
+predictions <- model %>%  predict(test.data)
+
+# model performance
+
+```{r}
+
+```
+
+data.frame(
+  RMSE = RMSE(predictions,test.data$medv),
+  R2 = R2(predictions,test.data$medv)
+)
+ggplot (train.data, aes(lstat,medv)) + geom_point() + stat_smooth(method = lm, formula = y ~ poly(x, 5))
+
+# Build the model
+
+#Log transformation
+
+```{r}
+
+```
+
+model <- lm(medv ~ log(lstat), data = train.data)
+
+# make predictions
+
+```{r}
+
+```
+
+predictions <- model %>%  predict(test.data)
+
+# model performance
+
+```{r}
+
+```
+
+data.frame(
+  RMSE = RMSE(predictions, test.data$medv),
+  R2 = R2(predictions, test.data$medv)
+)
+ggplot (train.data, aes(lstat,medv)) + geom_point() + stat_smooth(method = lm, formula = y ~ log(x))
+
+
+#Spline regression
+
+```{r}
+
+```
+
+knots <- quantile(train.data$lstat, p = c(0.25,0.5,0.75))
+
+library(splines)
+
+# Build the model
+
+```{r}
+
+```
+
+knots <- quantile(train.data$lstat, p = c(0.25,0.5,0.75))
+model <- lm(medv ~ bs(lstat, knots = knots, degree = 2), data = train.data)
+
+# make predictions
+
+```{r}
+
+```
+
+predictions <- model %>%  predict(test.data)
+
+# model performance
+
+```{r}
+
+```
+
+data.frame(
+  RMSE = RMSE(predictions, test.data$medv),
+  R2 = R2(predictions, test.data$medv))
+
+ggplot (train.data, aes(lstat,medv)) + 
+  geom_point() + 
+  stat_smooth(method = lm, formula = y ~ splines::bs(x, df = 3))
+
+
+#Generalized additive models, or GAM = technique to automatically fit a spline
+
+```{r}
+
+```
+
+library("mgcv")
+
+# Build the model
+
+```{r}
+
+```
+
+model <- gam(medv ~ s(lstat), data = train.data)
+
+# make predictions
+
+```{r}
+
+```
+
+predictions <- model %>%  predict(test.data)
+
+# model performance
+
+```{r}
+
+```
+data.frame(
+  RMSE = RMSE(predictions, test.data$medv),
+  R2 = R2(predictions, test.data$medv)
+)
+ggplot (train.data, aes(lstat,medv)) + geom_point() + stat_smooth(method = gam, formula = y ~ s(x))
+
+
+#-------------------------------------------------------------------------------
+#III Regression Diagnostics
+#Chapter7: Introduction
+#Chapter8: Regression Assumptions and Diagnostics
+
+```{r}
+
+```
+
+library(tidyverse)
+library(broom)
+theme_set(theme_classic())
+
+#Load the data
+
+```{r}
+
+```
+
+data("marketing", package = "datarium")
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(marketing, 3)
+model <- lm(sales ~ youtube, data = marketing)
+model 
+
+#Fitted values and residuals
+
+```{r}
+
+```
+
+model.diag.metrics <- augment(model)
+head(model.diag.metrics)
+ggplot (model.diag.metrics, aes(youtube, sales)) + geom_point() + stat_smooth(method = lm , se = FALSE)+ geom_segment(aes(xend =youtube, yend =.fitted), color = "red",size=0.3)
+
+#Regression diagnostics
+
+```{r}
+
+```
+
+par(mfrow = c(2, 2))
+plot(model)
+library(ggfortify)
+autoplot(model)
+
+# Add observations indices and
+# drop some columns (.se.fit,.sigma) for simplification
+
+```{r}
+
+```
+
+model.diag.metrics <- model.diag.metrics %>% 
+mutate (index = 1:nrow(model.diag.metrics)) %>% 
+select (index, everything(), -.se.fit, -.sigma) 
+
+# Inspect the data 
+
+```{r}
+
+```
+
+head(model.diag.metrics, 4)
+plot(model, 1)#?
+plot(model, 3)
+model2 <- lm(log(sales) ~ youtube, data = marketing)
+plot(model2, 3)
+plot(model, 2)
+plot(model, 5)
+
+#cook's distance
+
+```{r}
+
+```
+
+plot(model, 4)
+
+#residuals vs leverage
+
+```{r}
+
+```
+
+plot(model, 5)
+plot(model, 4 ,id.= 5)
+model.diag.metrics %>%
+top_n(3, wt = cooksd)
+df2 <- data.frame(
+x = c(marketing$youtube, 500, 600),
+y = c(marketing$sales, 80, 100)
+)
+model2 <- lm(y ~ x, df2)
+
+#cook's distance
+
+```{r}
+
+```
+
+plot(model2, 4)
+
+#residuals vs leverage
+
+```{r}
+
+```
+
+plot(model2, 5)
+
+#-------------------------------------------------------------------------------
+#Chapter9: Multicollinearity
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+
+#Load the data
+
+```{r}
+
+```
+
+data ("Boston" , package = "MASS")
+
+# Split the data into training and test set
+
+```{r}
+
+```
+
+set.seed(123)
+training.samples <- Boston$medv %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- Boston[training.samples, ]
+test.data <- Boston[-training.samples, ]
+
+# Build the model
+
+```{r}
+
+```
+
+model1 <- lm(medv ~., data = train.data)
+
+# make predictions
+
+```{r}
+
+```
+
+predictions <- model1 %>%  predict(test.data)
+
+# model performance
+
+```{r}
+
+```
+data.frame(
+RMSE = RMSE(predictions, test.data$medv),
+R2 = R2(predictions, test.data$medv)
+)
+
+#Detecting multicollinearity
+
+```{r}
+
+```
+car::vif(model1)
+
+# Build a model excluding the tax variable
+
+```{r}
+
+```
+
+model2 <- lm(medv ~.-tax, data = train.data)
+
+# Make predictions
+
+```{r}
+
+```
+
+predictions <- model2 %>% predict (test.data)
+
+# Model performance
+
+```{r}
+
+```
+
+data.frame(
+RMSE = RMSE(predictions, test.data$medv),
+R2 = R2(predictions, test.data$medv)
+)
+
+#-------------------------------------------------------------------------------
+#Chapter10: Confounding Variables
+
+```{r}
+
+```
+
+library (gapminder)
+lm(lifeExp ~ gdpPercap, data = gapminder)
+lm(lifeExp ~ gdpPercap + continent, data = gapminder)
+
+#-------------------------------------------------------------------------------
+#IV Regression Model Validation
+#Chapter11: Introduction
+#Chapter12:Regression Model Accuracy Metrics
+
+```{r}
+
+```
+
+library (tidyverse)
+library (modelr)
+library (broom)
+
+#Load the data
+
+```{r}
+
+```
+
+data("swiss")
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(swiss, 3)
+model1 <- lm(Fertility ~.,data = swiss)
+model2 <- lm(Fertility ~.-Examination, data = swiss)
+summary (model1)
+AIC(model1)
+BIC(model1)
+library (modelr)
+
+```{r}
+
+```
+
+data.frame(
+R2 = rsquare(model1, data = swiss),
+RMSE = rmse(model1, data = swiss),
+MAE = mae(model1, data = swiss)
+)
+
+```{r}
+
+```
+
+library(caret)
+predictions <- model1 %>% predict (swiss)
+data.frame(
+R2 = R2(predictions, swiss$Fertility),
+RMSE = RMSE(predictions, swiss$Fertility),
+MAE = MAE(predictions, swiss$Fertility)
+) 
+library (broom)
+glance (model1)
+
+# Make predictions and compute the a
+# R2, RMSE and MAE
+
+```{r}
+
+```
+
+swiss %>%
+add_predictions(model1) %>%
+summarise(
+R2 = cor(Fertility, pred)^2,
+MSE = mean((Fertility - pred)^2),
+RMSE = sqrt (MSE),
+MAE = mean(abs(Fertility - pred))
+)
+
+# Metrics for model 1
+
+```{r}
+
+```
+
+glance(model1) %>%
+select(adj.r.squared, sigma, AIC, BIC, p.value)
+
+# Metrics for model 2 
+
+```{r}
+
+```
+
+glance(model2) %>%
+select(adj.r.squared, sigma, AIC, BIC, p.value)
+sigma(model1)/mean(swiss$Fertility) 
+#-------------------------------------------------------------------------------
+#Chapter13:Cross-validation
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+
+#Load the data
+
+```{r}
+
+```
+
+data("swiss")
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(swiss, 3)
+
+# Split the data into training and test set a
+
+```{r}
+
+```
+
+set.seed(123)
+training.samples <- swiss$Fertility %>% 
+createDataPartition(p = 0.8, list = FALSE)
+train.data <- swiss[training.samples, ] 
+test.data <- swiss[-training.samples, ] 
+
+# Build the model 
+
+```{r}
+
+```
+
+model <- lm(Fertility ~., data = swiss)
+
+# Make predictions and compute the R2, RMSE and MAE
+
+```{r}
+
+```
+
+predictions <- model %>% predict (test.data)
+data.frame( R2 = R2(predictions, test.data$Fertility),
+RMSE = RMSE(predictions, test.data$Fertility),
+MAE = MAE(predictions, test.data$Fertility))
+RMSE = RMSE(predictions, test.data$Fertility)/mean(test.data$Fertility)
+
+#Leave one out cross validation - LOOCV
+# Define training control
+
+```{r}
+
+```
+
+train.control <- trainControl(method = "LOOCV")
+
+# Train the model
+
+```{r}
+
+```
+
+model <- train(Fertility ~., data = swiss, method = "lm",
+trControl = train.control)
+
+# Summarize the results
+
+```{r}
+
+```
+
+print (model)
+
+#K-fold cross-validation
+# Define training control
+
+```{r}
+
+```
+
+set.seed(123)
+train.control <- trainControl(method = "cv", number = 10)
+
+# Train the model
+
+```{r}
+
+```
+
+model <- train(Fertility ~., data = swiss, method = "lm",
+trControl = train.control)
+
+# Summarize the results
+
+```{r}
+
+```
+
+print (model)
+
+#Repeated K-fold cross-validation
+# Define training control
+
+```{r}
+
+```
+
+set.seed (123)
+train.control <- trainControl(method = "repeatedcv",
+number = 10, repeats = 3)
+
+# Train the model
+
+```{r}
+
+```
+
+model <- train(Fertility ~., data = swiss, method = "lm",
+trControl = train.control)
+
+# Summarize the results
+
+```{r}
+
+```
+
+print (model)
+#-------------------------------------------------------------------------------
+#Chapter14: Bootstrap Resampling
+
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+
+#Load the data
+
+```{r}
+
+```
+
+data("swiss")
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(swiss, 3)
+
+# Define training control
+
+```{r}
+
+```
+
+set.seed(123)
+train.control <- trainControl(method = "boot", number = 100)
+
+# Train the model
+
+```{r}
+
+```
+
+model <- train(Fertility ~., data = swiss, method = "lm",
+trControl = train.control)
+
+# Summarize the results
+
+```{r}
+
+```
+
+print (model)
+model_coef <- function(data, index){
+coef(lm(Fertility ~., data = data, subset = index))
+}
+
+model_coef(swiss, 1:47)
+
+library(boot)
+boot (swiss, model_coef, 500)
+summary(lm(Fertility ~., data = swiss))$coef
+
+#-------------------------------------------------------------------------------
+#V Model Selection
+#Chapter15: Introduction
+#Chapter16: Best Subsets Regression
+
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+library (leaps)
+
+#Load the data
+
+```{r}
+
+```
+
+data("swiss")
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(swiss, 3)
+
+#Computing best subsets regression
+
+```{r}
+
+```
+
+models <- regsubsets(Fertility ~., data = swiss, nvmax = 5)
+summary (models)
+
+res.sum <- summary (models)
+data.frame(
+Adj.R2 = which.max(res.sum$adjr2),
+CP = which.min(res.sum$cp),
+BIC = which.min(res.sum$bic)
+)
+
+# id: model id
+# object: regsubsets object 
+# data: data used to fit regsubsets
+
+```{r}
+
+```
+
+get_model_formula <- function(id, object){
+
+# get models data 
+
+```{r}
+
+```
+
+models <- summary (object) $which[id,-1]
+
+# Get outcome variable 
+
+```{r}
+
+```
+
+form <- as.formula(object$call[[2]]) 
+outcome <- all.vars(form) [1] 
+
+# Get model predictors
+
+```{r}
+
+```
+
+predictors <- names(which(models == TRUE)) 
+predictors <- paste(predictors, collapse = "+") 
+
+# Build model formula
+
+```{r}
+
+```
+
+as.formula(paste0(outcome, "~", predictors)) 
+}
+get_model_formula(3, models)
+get_cv_error <- function(model.formula, data){
+set.seed(1)
+train.control <- trainControl(method = "cv", number = 5)
+cv <- train(model.formula, data = data, method = "lm",
+trControl = train.control)
+cv$results$RMSE
+}
+
+# Compute cross-validation error 
+
+```{r}
+
+```
+
+model.ids <- 1:5 
+cv.errors <- map(model.ids, get_model_formula, models) %>%
+map(get_cv_error, data = swiss) %>% 
+unlist()
+cv.errors
+
+# Select the model that minimize the CV error
+
+```{r}
+
+```
+
+which.min(cv.errors)
+coef (models, 4)
+#-------------------------------------------------------------------------------
+#Chapter17: Stepwise Regression
+
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+library (leaps)
+library (MASS)
+
+# Fit the full model
+
+```{r}
+
+```
+
+full.model <- lm(Fertility ~., data = swiss)
+
+
+#Stepwise regression model
+
+```{r}
+
+```
+
+step.model <- stepAIC(full.model, direction = "both",
+trace = FALSE)
+summary (step.model)
+models <- regsubsets(Fertility~., data = swiss, nvmax = 5,
+method = "seqrep")
+summary (models)
+
+# Set seed for reproducibility
+
+```{r}
+
+```
+
+set.seed(123)
+
+# Set up repeated k-fold cross-validation
+
+```{r}
+
+```
+
+train.control <- trainControl (method = "cv", number = 10)
+
+# Train the model
+
+```{r}
+
+```
+
+step.model <- train(Fertility ~., data = swiss,
+method = "leapBackward",
+tuneGrid = data.frame(nvmax = 1:5),
+trControl = train.control
+)
+
+```{r}
+
+```
+
+step.model$results 
+step.model$bestTune
+summary(step.model$finalModel)
+coef(step.model$finalModel,4)
+lm(Fertility ~ Agriculture + Education + Catholic + Infant.Mortality, data = swiss)
+
+library (MASS)
+res.lm <- lm(Fertility ~., data = swiss)
+step <- stepAIC(res.lm, direction = "both", trace = FALSE)
+step
+
+# Train the model
+
+```{r}
+
+```
+
+step.model <- train(Fertility ~., data = swiss,
+method = "lmStepAIC",
+trControl = train.control,
+trace = FALSE
+)
+
+# Model accuracy
+
+```{r}
+
+```
+
+step.model$results
+
+# Final model coefficients
+
+```{r}
+
+```
+
+step.model$finalModel
+
+# Summary of the model
+
+```{r}
+
+```
+
+summary (step.model$finalModel)
+#-------------------------------------------------------------------------------
+#Chapter18: Penalized Regression:	Ridge, Lasso and Elastic Net
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+library (glmnet)
+
+#Load the data
+
+```{r}
+
+```
+
+data ("Boston" , package = "MASS")
+
+# Split the data into training and test set
+set.seed(123)
+training.samples <- Boston$medv %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- Boston[training.samples, ]
+test.data <- Boston[-training.samples, ]
+#predictor variables
+
+```{r}
+
+```
+
+x<- model.matrix(medv~.,train.data)[,-1]
+
+#outcome variable
+
+```{r}
+
+```
+
+y <- train.data$medv
+glmnet(x,y,alpha = 1,lambda = NULL)
+
+# Find the best lambda using cross-validation
+
+```{r}
+
+```
+
+set.seed (123)
+cv <- cv.glmnet(x, y, alpha = 0)
+
+# Display the best Lambda value
+
+```{r}
+
+```
+
+cv$lambda.min
+
+# Fit the final model on the training data
+
+```{r}
+
+```
+
+model <- glmnet(x, y, alpha = 0, lambda = cv$lambda.min)
+
+# Display regression coefficients
+
+```{r}
+
+```
+
+coef (model)
+
+# Make predictions on the test data
+
+```{r}
+
+```
+
+x.test <- model.matrix(medv ~., test.data)[,-1]
+predictions <- model %>% predict(x.test) %>% as.vector()
+
+# Model performance metrics
+
+```{r}
+
+```
+
+data.frame(
+RMSE = RMSE(predictions, test.data$medv),
+Rsquare = R2(predictions, test.data$medv)
+)
+
+# Find the best lambda using cross-validation
+
+```{r}
+
+```
+
+set.seed (123)
+cv <- cv.glmnet(x, y, alpha = 1)
+
+# Display the best lambda value
+
+```{r}
+
+```
+
+cv$lambda.min
+
+# Fit the final model on the training data
+model <- glmnet(x, y, alpha = 1, lambda = cv$lambda.min)
+# Dsiplay regression coefficients
+
+```{r}
+
+```
+
+coef (model)
+
+# Make predictions on the test data
+
+```{r}
+
+```
+
+x.test <- model.matrix(medv ~., test.data)[,-1]
+predictions <- model %>% predict(x.test) %>% as.vector()
+
+# Model performance metrics
+
+```{r}
+
+```
+
+data.frame(
+RMSE = RMSE(predictions, test.data$medv),
+Rsquare = R2(predictions, test.data$medv)
+)
+
+# Build the model using the training set
+
+```{r}
+
+```
+
+set.seed (123)
+model <- train(
+medv ~., data = train.data, method = "glmnet",
+trControl = trainControl("cv", number = 10),
+tuneLength = 10
+)
+
+# Best tuning parameter
+
+```{r}
+
+```
+
+model$bestTune
+
+# Coefficient of the final model.You need
+# to specify the best lambda
+
+```{r}
+
+```
+
+coef (model$finalModel, model$bestTune$lambda)
+
+# Make predictions on the test data
+
+```{r}
+
+```
+
+x.test <- model.matrix(medv ~., test.data)[,-1]
+predictions <- model %>% predict (x.test)
+
+# Model performance metrics
+
+```{r}
+
+```
+
+data.frame(
+RMSE = RMSE(predictions, test.data$medv),
+Rsquare = R2(predictions, test.data$medv)
+)
+lambda <- 10^seq(-3, 3, length = 100)
+
+# Build the model
+
+```{r}
+
+```
+
+set.seed(123)
+ridge <- train(
+medv ~., data = train.data, method = "glmnet",
+trControl = trainControl("cv", number = 10),
+tuneGrid = expand.grid(alpha = 0, lambda = lambda)
+)
+
+# Model coefficients
+
+```{r}
+
+```
+
+coef (ridge$finalModel, ridge$bestTune$lambda)
+
+# Make predictions
+
+```{r}
+
+```
+
+predictions <- ridge %>% predict (test.data)
+
+# Model prediction performance
+
+```{r}
+
+```
+
+data.frame(
+RMSE = RMSE(predictions, test.data$medv),
+Rsquare = R2(predictions, test.data$medv)
+)
+
+# Build the model
+
+```{r}
+
+```
+
+set.seed(123) 
+lasso <- train(
+medv~.,data=train.data,method ="glmnet",
+trControl = trainControl("cv", number = 10),
+tuneGrid = expand.grid(alpha = 1, lambda = lambda)
+)
+
+# model coefficients
+
+```{r}
+
+```
+
+coef (lasso$finalModel, lasso$bestTune$lambda)
+
+# make predictions
+
+```{r}
+
+```
+
+predictions <- lasso %>% predict(test.data)
+
+# Model prediction performance
+
+```{r}
+
+```
+
+data.frame(
+RMSE = RMSE(predictions, test.data$medv),
+Requare = R2(predictions, test.data$medv)
+)
+
+# Build the model
+
+```{r}
+
+```
+
+set.seed(123)
+elastic <- train(
+  medv ~., data = train.data, method = "glmnet", 
+  trControl = trainControl("cv", number = 10),
+  tuneLength = 10
+  )
+
+# Model coefficients 
+
+```{r}
+
+```
+
+coef (elastic$finalModel, elastic$bestTune$lambda)
+
+# Make predictions 
+
+```{r}
+
+```
+
+predictions <- elastic %>% predict (test.data)
+
+# Model prediction performance
+
+```{r}
+
+```
+
+data.frame( 
+RMSE = RMSE(predictions, test.data$medv),
+Rsquare = R2(predictions, test.data$medv)
+)
+models <- list (ridge = ridge, lasso = lasso, elastic = elastic)
+resamples(models) %>% summary( metric = "RMSE")
+
+#-------------------------------------------------------------------------------
+#Chapter19: Principal Component and Partial Least Squares Regression
+
+```{r}
+
+```
+
+
+library (tidyverse)
+library (caret)
+library (pls)
+
+#Load the data
+
+```{r}
+
+```
+
+data ("Boston" , package = "MASS")
+
+# Split the data into training and test set
+
+```{r}
+
+```
+
+set.seed(123)
+training.samples <- Boston$medv %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- Boston[training.samples, ]
+test.data <- Boston[-training.samples, ]
+
+#Computing principal component regression
+#Build the model using the training set
+
+```{r}
+
+```
+
+set.seed (123)
+model <- train(
+  medv ~., data = train.data, method = "pcr",
+  scale = TRUE,
+  trControl = trainControl("cv", number = 10),
+  tuneLength = 10
+  )
+
+#plot model RMSE vs different values of components
+
+```{r}
+
+```
+
+plot (model)
+
+#print the best tuning parameter ncomp that
+#minimize the cross-validation error,RMSE
+
+```{r}
+
+```
+
+model$bestTune
+
+#summarize the final model
+
+```{r}
+
+```
+
+summary(model$finalmodel)
+
+# Make predictions 
+
+```{r}
+
+```
+
+predictions <- model %>% predict (test.data)
+
+# Model prediction Metrics
+
+```{r}
+
+```
+
+data.frame(
+  RMSE = caret::RMSE(predictions, test.data$medv),
+  Rsquare = caret::R2(predictions, test.data$medv)
+)
+
+#Computing partial least squares
+# Build the model using the training set
+
+```{r}
+
+```
+
+set.seed (123)
+model <- train(
+medv ~., data = train.data, method = "pls",
+scale = TRUE,
+trControl = trainControl("cv", number = 10),
+tuneLength = 10
+)
+
+#plot model RMSE vs different values of components
+
+```{r}
+
+```
+
+plot (model)
+
+#print the best tuning parameter ncomp that
+#minimize the cross-validation error,RMSE
+
+```{r}
+
+```
+
+model$bestTune
+
+#summarize the final model
+
+```{r}
+
+```
+
+summary(model$finalmodel)
+
+# Make predictions 
+
+```{r}
+
+```
+
+predictions <- model %>% predict (test.data)
+
+# Model  performance metrics
+
+```{r}
+
+```
+
+data.frame( 
+RMSE = caret::RMSE(predictions, test.data$medv),
+Requare = caret::R2(predictions, test.data$medv)
+)
+
+#-------------------------------------------------------------------------------
+#VI Classification
+#Chapter20: Introduction
+
+#install.packages('mlbench')
+
+```{r}
+
+```
+
+library(mlbench)
+
+#Load the data
+
+```{r}
+
+```
+
+data ("PimaIndiansDiabetes2" , package = "mlbench")
+
+# Inspect the data
+
+```{r}
+
+```
+
+head(PimaIndiansDiabetes2,4)
+
+#Load the data
+
+```{r}
+
+```
+
+data("iris")
+
+# Inspect the data
+
+```{r}
+
+```
+
+head(iris,4)
+
+#-------------------------------------------------------------------------------
+#Chapter21: Logistic Regression
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+theme_set(theme_bw())
+
+#Load the data
+
+```{r}
+
+```
+
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit(PimaIndiansDiabetes2)
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(PimaIndiansDiabetes2, 3)
+
+# Split the data into training and test set
+
+```{r}
+
+```
+
+set.seed(123)
+training.samples <- PimaIndiansDiabetes2$diabetes %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data <- PimaIndiansDiabetes2[training.samples, ]
+test.data <- PimaIndiansDiabetes2[-training.samples, ]
+
+# Fit the model 
+
+```{r}
+
+```
+
+model <- glm( diabetes ~., data = train.data, family = binomial) 
+
+# Summarize the model
+
+```{r}
+
+```
+
+summary (model)
+
+#Make predictions
+
+```{r}
+
+```
+
+probabilities <- model %>% predict (test.data, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+
+# Model accuracy
+
+```{r}
+
+```
+
+mean (predicted.classes == test.data$diabetes)
+
+#Simple logistic regression
+
+```{r}
+
+```
+
+model <- glm( diabetes ~ glucose, data = train.data, family = binomial)
+summary(model)$coef
+newdata <- data.frame(glucose = c(20, 180))
+probabilities <- model %>% predict (newdata, type = "response")
+predicted.clasees <- ifelse (probabilities > 0.5,"pos","neg")
+predicted.classes
+
+
+```{r}
+
+```
+
+train.data %>% #?
+  mutate (prob = ifelse(diabetes == "pos",1,0)) %>%
+  ggplot(aes(glucose, prob)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "glm", method.arge = list(family="binomial"))+
+  labs(
+    title = "Logistic Regression Model",
+    x= "Plasma Glucose Concentration",
+    y = "Probability of being diabete-pos"
+    )
+
+```{r}
+
+```
+
+model <- glm(diabetes~glucose+mass+pregnant,data = train.data,family=binomial)
+summary(model)$coef
+model <- glm(diabetes~.,data = train.data, family = binomial)
+summary(model)$coef
+coef(model)
+summary(model)$coef
+model <- glm(diabetes~pregnant+glucose+pressure+mass+pedigree,data = train.data,family=binomial)
+probabilities <- model %>% predict (test.data, type = "response")
+head(probabilities)
+
+```{r}
+
+```
+
+contrasts(test.data$diabetes)
+predicted.clasees <- ifelse (probabilities > 0.5,"pos","neg")
+head(predicted.classes)
+mean(predicted.classes,test.data$diabetes)
+library("mgcv")
+
+# Fit the model 
+
+```{r}
+
+```
+
+gam.model <- gam( diabetes ~s(glucose)+mass+pregnant, data = train.data, family = "binomial") 
+
+# Summarize the model
+
+```{r}
+
+```
+
+summary (gam.model)
+
+#Make predictions
+
+```{r}
+
+```
+
+probabilities <- gam.model %>% predict (test.data, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+
+# Model accuracy
+
+```{r}
+
+```
+
+mean (predicted.classes == test.data$diabetes)
+
+#-------------------------------------------------------------------------------
+#Chapter22: Stepwise Logistic Regression
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+
+#Load the data AND remove NAs
+
+```{r}
+
+```
+
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit(PimaIndiansDiabetes2)
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(PimaIndiansDiabetes2, 3)
+
+# Split the data into training and test set
+
+```{r}
+
+```
+
+set.seed(123)
+training.samples <- PimaIndiansDiabetes2 $ diabetes %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- PimaIndiansDiabetes2[training.samples, ]
+test.data <- PimaIndiansDiabetes2[-training.samples, ]
+library("MASS")
+
+# Fit the model 
+
+```{r}
+
+```
+
+model <- glm( diabetes ~., data = train.data, family = binomial) %>%
+stepAIC(trace=FALSE)
+
+# Summarize the final selected model
+
+```{r}
+
+```
+
+summary (model)
+
+#Make predictions
+
+```{r}
+
+```
+
+probabilities <- model %>% predict (test.data, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+
+# Model accuracy
+
+```{r}
+
+```
+
+mean (predicted.classes == test.data$diabetes)
+full.model <-glm( diabetes ~., data = train.data, family = binomial)
+coef(full.model)
+library("MASS")
+step.model <- full.model %>% stepAIC(trace=FALSE)
+coef(step.model)
+
+# Make predictions 
+
+```{r}
+
+```
+
+probabilities <- full.model %>% predict(test.data, type = "response") 
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg") 
+
+# Prediction accuracy 
+
+```{r}
+
+```
+
+observed.classes <- test.data$diabetes
+mean (predicted.classes == observed.classes) 
+
+# Make predictions 
+
+```{r}
+
+```
+
+probabilities <- predict(step.model, test.data, type = "response") 
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg") 
+
+# Prediction accuracy 
+
+```{r}
+
+```
+
+observed.classes <- test.data$diabetes 
+mean(predicted.classes == observed.classes)
+#-------------------------------------------------------------------------------
+#Chapter23: Penalized Logistic Regression
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+library (glmnet)
+
+#Load the data AND remove NAs
+
+```{r}
+
+```
+
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit(PimaIndiansDiabetes2)
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(PimaIndiansDiabetes2, 3)
+
+# Split the data into training and test set
+
+```{r}
+
+```
+
+set.seed(123)
+training.samples <- PimaIndiansDiabetes2 $ diabetes %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- PimaIndiansDiabetes2[training.samples, ]
+test.data <- PimaIndiansDiabetes2[-training.samples, ]
+
+# Dumy code categorical predictor variables 
+
+```{r}
+
+```
+
+x <- model.matrix(diabetes~., train.data)[,-1] 
+
+# Convert the outcome (class) to a numerical variable 
+
+```{r}
+
+```
+
+y <- ifelse(train.data$diabetes == "pos", 1, 0)
+glmnet(x, y, family = "binomial", alpha = 1, lambda = NULL)
+ library (glmnet)
+ # Find the best Lambda using cross-validation
+set.seed (123) 
+cv.lasso <- cv.glmnet(x, y, alpha = 1, family = "binomial")
+
+# Fit the final model on the training data 
+
+```{r}
+
+```
+
+model <- glmnet(x, y, alpha = 1, family = "binomial")
+lambda = cv.lasso$lambda.min
+
+# Display regression coefficients
+
+```{r}
+
+```
+
+coef (model)
+
+# Make predictions on the test data 
+
+```{r}
+
+```
+
+x.test <- model.matrix(diabetes ~., test.data)[,-1] 
+probabilities <- model %>% predict(newx = x.test) 
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg") 
+
+# Model accuracy 
+
+```{r}
+
+```
+
+observed.classes <- test.data$diabetes 
+mean(predicted.classes == observed.classes)
+library (glmnet)
+set.seed (123) 
+cv.lasso <- cv.glmnet(x, y, alpha = 1, family = "binomial")
+plot(cv.lasso)
+cv.lasso$lambda.min
+cv.lasso$lambda.1se
+coef(cv.lasso,cv.lasso$lambda.min)
+coef(cv.lasso,cv.lasso$lambda.1se)
+
+# Final model with lambda.min
+
+```{r}
+
+```
+
+lasso.model <- glmnet(x, y, alpha = 1, family = "binomial",
+lambda = cv.lasso$lambda.min)
+
+# Make prediction on test data
+
+```{r}
+
+```
+
+x.test <- model.matrix (diabetes ~., test.data)[,-1]
+probabilities <- lasso.model %>% predict (newx = x.test)
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+
+# Model accuracy
+
+```{r}
+
+```
+
+observed.classes <- test.data$diabetes
+mean (predicted.classes == observed.classes)
+
+# Final model with lambda.1se
+
+```{r}
+
+```
+
+lasso.model <- glmnet(x, y, alpha = 1, family = "binomial",
+lambda = cv.lasso$lambda.1se)
+
+# Make prediction on test data
+
+```{r}
+
+```
+
+x.test <- model.matrix (diabetes ~., test.data)[,-1]
+probabilities <- lasso.model %>% predict (newx = x.test)
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+
+# Model accuracy rate
+
+```{r}
+
+```
+
+observed.classes <- test.data$diabetes
+mean(predicted.classes == observed.classes)
+
+# Fit the model
+
+```{r}
+
+```
+
+full.model <- glm(diabetes ~., data = train.data, family = binomial)
+
+# Make predictions
+
+```{r}
+
+```
+
+probabilities <- full.model %>% predict(test.data, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+
+# Model accuracy
+
+```{r}
+
+```
+
+observed.classes <- test.data$diabetes
+mean(predicted.classes == observed.classes)
+
+
+#-------------------------------------------------------------------------------
+#Chapter24: Logistic Regression Assumptions and Diagnostics
+
+```{r}
+
+```
+
+library(tidyverse)
+library(broom)
+theme_set(theme_classic())
+
+#Load the data
+
+```{r}
+
+```
+
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit(PimaIndiansDiabetes2)
+
+# Fit the logistic regression model 
+
+```{r}
+
+```
+
+model <- glm( diabetes ~., data = PimaIndiansDiabetes2 , family = binomial) 
+
+#predict the probability (p) of diabete positivity
+
+```{r}
+
+```
+
+probabilities <- predict (model, type = "response")
+predicted.clasees <- ifelse (probabilities > 0.5,"pos","neg")
+head(predicted.clasees)
+
+# Select only numeric predictors 
+
+```{r}
+
+```
+
+ mydata <- PimaIndiansDiabetes2 %>% 
+ dplyr::select_if(is.numeric) 
+predictors <- colnames(mydata) 
+
+# Bind the logit and tidying the data for plot 
+
+```{r}
+
+```
+
+mydata <- mydata %>% 
+mutate(logit = log(probabilities/(1-probabilities))) %>% 
+gather(key = "predictors", value = "predictor.value", -logit) 
+ggplot(mydata, aes(logit, predictor.value))+ 
+geom_point(size = 0.5, alpha = 0.5) + 
+geom_smooth(method = "loess") + 
+theme_bw() + 
+facet_wrap(~predictors, scales = "free_y")
+plot(model, which = 4 , id.n=3)
+
+# Extract model results 
+
+```{r}
+
+```
+
+model.data <- augment (model) %>% 
+mutate(index = 1:n()) 
+model.data %>% top_n(3,.cooksd) 
+ggplot(model.data, aes(index,.std.resid)) + 
+geom_point(aes(color = diabetes), alpha =.5) + 
+theme_bw()
+model.data %>% 
+filter(abs(.sdt.resid)>3)
+car::vif(model)
+
+#-------------------------------------------------------------------------------
+#Chapter25: Multinomial Logistic Regression
+
+```{r}
+
+```
+
+library (tidyverse)
+library (caret)
+library (nnet)
+
+#Load the data
+
+```{r}
+
+```
+
+data("iris")
+
+# Inspect the data
+
+```{r}
+
+```
+
+sample_n(iris, 3)
+
+# Split the data into training and test set
+
+```{r}
+
+```
+set.seed(123)
+training.samples <- iris$Species %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- iris[training.samples, ]
+test.data <- iris[-training.samples, ]
+# Fit the model 
+model <- nnet::multinom(Species ~., data = train.data) 
+# Summarize the model 
+summary (model) 
+# Make predictions
+predicted.classes <- model %>% predict(test.data)
+head (predicted.classes) 
+# Model accuracy 
+mean(predicted.classes == test.data$Species)
+mean(predicted.classes == test.data$Species)
+ 
+#-------------------------------------------------------------------------------
+#Chapter26: Discriminant Analysis
+
+library(tidyverse)
+library(caret)
+theme_set(theme_classic())
+#Load the data
+data("iris")
+# Inspect the data
+sample_n(iris, 3)
+# Split the data into training (80%)and test set(20%)
+set.seed(123)
+training.samples <- iris$Species %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- iris[training.samples, ]
+test.data <- iris[-training.samples, ]
+# Estimate preprocessing parameters 
+preproc.param <- train.data %>% 
+preProcess(method = c("center", "scale")) 
+# Transform the data using the estimated parameters 
+train.transformed <- preproc.param %>% predict (train.data) 
+test.transformed <- preproc.param %>% predict (test.data) 
+library (MASS) 
+# Fit the model 
+model <- lda(Species~., data = train.transformed)
+# Make predictions 
+predictions <- model %>% predict (test.transformed) 
+# Model accuracy 
+mean (predictions$class==test.transformed$Species) 
+library (MASS) 
+model <- lda(Species~., data = train.transformed) 
+model
+plot(model)
+predictions <- model %>% predict(test.transformed)
+names(predictions)
+# Predicted classes 
+head(predictions$class, 6) 
+# Predicted probabilities of class memebership.
+head(predictions$posterior, 6)
+# Linear discriminants 
+head(predictions$x, 3) 
+lda.data <- cbind(train.transformed, predict (model)$x)
+ggplot(lda.data, aes(LD1, LD2)) + 
+geom_point(aes(color = Species)) 
+mean(predictions$class==test.transformed$species)
+sum(predictions$posterior[ ,1] >=.5)
+library (MASS)
+# Fit the model
+model <- qda(Species~., data = train.transformed)
+model
+# Make predictions 
+predictions <- model %>% predict (test.transformed)
+# Model accuracy 
+mean(predictions$class == test.transformed$Species)
+library (mda)
+# Fit the model
+model <- mda(Species~., data = train.transformed)
+model
+# Make predictions
+predicted.classes <- model %>% predict(test.transformed)
+# Model accuracy
+mean(predicted.classes == test.transformed$Species)
+library (mda)
+# Fit the model
+model <- mda(Species~., data = train.transformed)
+model
+# Make predictions
+predicted.classes <- model %>% predict(test.transformed)
+# Model accuracy
+mean(predicted.classes == test.transformed$Species)
+library (klaR)
+# Fit the model
+model <- rda(Species~., data = train.transformed)
+# Make predictions
+predictions <- model %>% predict (test.transformed)
+# Model accuracy
+mean(predictions$class == test.transformed$Species)
+#-------------------------------------------------------------------------------
+#Chapter27: Naive Bayes Classifier
+
+library (tidyverse)
+library (caret)
+#Load the data AND remove NAs
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit(PimaIndiansDiabetes2)
+# Inspect the data
+sample_n(PimaIndiansDiabetes2, 3)
+# Split the data into training and test set
+set.seed(123)
+training.samples <- PimaIndiansDiabetes2 $ diabetes %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- PimaIndiansDiabetes2[training.samples, ]
+test.data <- PimaIndiansDiabetes2[-training.samples, ]
+library (klaR)
+# Fit the model
+model <- NaiveBayes(diabetes ~., data = train.data)
+# Make predictions
+predictions <- model %>% predict (test.data)
+# Model accuracy
+mean(predictions$class == test.data$diabetes)
+
+#Using caret R package
+library (klaR)
+# Build the model
+set.seed(123)
+model <- train(diabetes ~., data = train.data,method ="nb", 
+               trControl = trainControl("cv", number=10))
+# Make predictions
+predicted.classes <- model %>% predict (test.data)
+# Model n accuracy
+mean(predicted.clasees == test.data$diabetes)
+
+#-------------------------------------------------------------------------------
+#Chapter28: Support Vector Machine
+
+library (tidyverse)
+library (caret)
+#Load the data AND remove NAs
+data("PimaIndiansDiabetes2", package = "mlbench")
+pima.data <- na.omit(PimaIndiansDiabetes2)
+# Inspect the data
+sample_n(pima.data, 3)
+# Split the data into training and test set
+set.seed(123)
+training.samples <- pima.data $ diabetes %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- pima.data [training.samples, ]
+test.data <- pima.data [-training.samples, ]
+# Fit the model on the training set 
+set.seed(123) 
+model <- train(
+diabetes ~., data = train.data, method = "svmLinear",
+trControl = trainControl("cv", number = 10),
+preProcess = c("center","scale") 
+)
+# Make predictions on the test data 
+predicted.classes <- model %>% predict(test.data) 
+head(predicted.classes) 
+# Compute model accuracy rate 
+mean(predicted.classes == test.data$diabetes)
+# Fit the model on the training set 
+set.seed(123) 
+model <- train( 
+diabetes ~., data = train.data, method = "svmLinear", 
+trControl = trainControl("cv", number = 10), 
+tuneGrid = expand.grid(C = seq(0, 2, length = 20)), 
+preProcess = c("center","scale") 
+) 
+# Plot model accuracy vs different values of Cost 
+plot (model)
+# Print the best tuning parameter C that 
+# maximizes model accuracy 
+model$bestTune 
+# Make predictions on the test data 
+predicted.classes <- model %>% predict (test.data) 
+# Compute model accuracy rate 
+mean(predicted.classes == test.data$diabetes)
+#Fit the model on the training set
+set.seed (123)
+model <- train( 
+diabetes ~., data = train.data, method = "svmRadial", 
+trControl = trainControl("cv", number = 10), 
+preProcess = c("center","scale"), 
+tuneLength = 10 
+)
+# Print the best tuning parameter sigma and C that 
+# maximizes model accuracy 
+model$bestTune
+# Make predictions on the test data 
+predicted.classes <- model %>% predict (test.data)
+# Compute model accuracy rate 
+mean(predicted.classes == test.data$diabetes) 
+# Fit the model on the training set
+ set.seed (123) 
+model <- train( 
+diabetes ~., data = train.data, method = "svmPoly",
+trControl = trainControl("cv", number = 10), 
+preProcess = c("center","scale"), 
+tuneLength = 4
+) 
+# Print the best tuning parameter sigma and C that 
+# maximizes model accuracy 
+model$bestTune 
+# Make predictions on the test data 
+predicted.classes <- model %>% predict (test.data)
+# Compute model accuracy rate
+mean(predicted.classes == test.data$diabetes)
+
+#-------------------------------------------------------------------------------
+#Chapter29: Classification Model Evaluation
+
+library (tidyverse)
+library (caret)
+# Load the data
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit(PimaIndiansDiabetes2)
+# Inspect the data
+sample_n(pima.data, 3)
+# Split the data into training and test set
+set.seed(123)
+training.samples < pima.data$diabetes %>%
+createDataPartition(p = 0.8, list = FALSE)
+train.data <- pima.data[training.samples, ] 
+test.data <- pima.data[-training.samples, ]
+library (MASS)
+# Fit LDA
+fit <- lda(diabetes ~., data = train.data)
+# Make predictions on the test data
+predictions <- predict(fit, test.data)
+prediction.probabilities <- predictions$posterior[,2]
+predicted.classes <- predictions$class
+observed.classes <- test.data$diabetes
+accuracy <- mean(observed.classes == predicted.classes)
+accuracy
+error <- mean(observed.classes != predicted.classes)
+error 
+# Confusion matriz, number of cases
+table(observed.classes, predicted.classes)
+# Confusion matric, proportion of cases
+table(observed.classes, predicted.classes) %>%
+prop.table() %>% round(digits = 3)
+confusionMatrix(predicted.classes, observed.classes,
+positive = "pos")
+library (pROC)
+# Compute roc
+res.roc <- roc(observed.classes, prediction.probabilities)
+plot.roc(res.roc, print.auc=TRUE)
+# Extract some interesting results
+roc.data <- data_frame(
+thresholds = res.roc$thresholds,
+sensitivity = res.roc$sensitivities,
+specificity = res.roc$specificities
+)
+# Get the probality threshold for specificity = 0.6
+roc.data %>% filter(specificity >= 0.6)
+plot.roc(res.roc, print.auc = TRUE, print.thres = "best")
+plot.roc(res.roc, print.thres = c(0.3, 0.5, 0.7))
+# Create some grouping variable
+glucose <- ifelse(test.data$glucose < 127.5, "glu.low", "glu.high")
+age <- ifelse(test.data$age < 28.5, "young", "old")
+roc.data <- roc.data %>%
+filter(thresholds !=-Inf) %>%
+mutate (glucose = glucose, age = age)
+# Create ROC curve
+ggplot(roc.data, aes(specificity, sensitivity)) +
+geom_path(aes(color = age))+
+scale_x_reverse(expand = c(0,0))+
+scale_y_continuous(expand = c(0,0))+
+geom_abline(intercept = 1, slope = 1, linetype = "dashed")+
+theme_bw()
+# Load the data 
+data("iris") 
+# Split the data into training (80%) and test set (20%)
+set.seed(123)
+training.samples <- iris$Species %>% 
+createDataPartition(p = 0.8, list = FALSE)
+train.data <- iris[training.samples, ] 
+test.data <- iris[-training.samples, ] 
+# Build the model on the train set
+library (MASS) 
+model <- lda(Species ~., data = train.data) 
+# Make predictions on the test data 
+predictions <- model %>% predict (test.data) 
+# Model accuracy 
+confusionMatrix(predictions$class, test.data$Species)
+
+#-------------------------------------------------------------------------------
+#VII Statistical Machine Learning
+#Chapter30: Introduction
+#Chapter31: KNN - k-Nearest Neighbors
+library (tidyverse)
+library (caret)
+
+#Load the data AND remove NAs
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit(PimaIndiansDiabetes2)
+# Inspect the data
+sample_n(PimaIndiansDiabetes2, 3)
+# Split the data into training and test set
+set.seed(123)
+training.samples <- PimaIndiansDiabetes2$ diabetes %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- PimaIndiansDiabetes2 [training.samples, ]
+test.data <- PimaIndiansDiabetes2 [-training.samples, ]
+
+#Computing KNN classifier
+# Fit the model on the training set 
+set.seed(123) 
+model <- train(
+  diabetes ~., data = train.data, method = "knn",
+  trControl = trainControl("cv", number = 10),
+  preProcess = c("center","scale"),
+  tuneLength = 20
+)
+# Plot model accuracy vs different values of k
+plot (model)
+
+# Print the best tuning parameter k that 
+# maximizes model accuracy 
+model$bestTune 
+# Make predictions on the test data 
+predicted.classes <- model %>% predict (test.data)
+head(predicted.classes)
+# Compute model accuracy rate
+mean(predicted.classes == test.data$diabetes)
+
+#KNN for regression
+#Load the data
+data ("Boston" , package = "MASS")
+# Inspect the data
+sample_n(Boston, 3)
+# Split the data into training and test set
+set.seed(123)
+training.samples <- Boston$medv %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- Boston[training.samples, ]
+test.data <- Boston[-training.samples, ]
+
+# Fit the model on the training set 
+set.seed(123) 
+model <- train(
+  medv ~., data = train.data, method = "knn",
+  trControl = trainControl("cv", number = 10),
+  preProcess = c("center","scale"),
+  tuneLength = 10
+  )
+# Plot model error RMSE vs different values of k
+plot (model)
+
+#	Best tuning parameter k that minimize the RMSE 
+model$bestTune
+#	Make predictions on the test data
+predictions <- model %>% predict(test.data) 
+head(predictions)
+#	Compute the prediction error RMSE
+RMSE(predictions, test.data$medv)
+
+
+#-------------------------------------------------------------------------------
+#Chapter32: Decision Tree Models
+
+library (tidyverse)
+library (caret)
+library (rpart)
+model <- rpart (Species ~., data = iris)
+par(xpd = NA) # otherwise on some devices the text is clipped
+plot (model)
+text(model, digits = 3)
+print(model, digits = 2)
+newdata <- data.frame(
+Sepal.Length = 6.5 , Sepal.Width= 3.0 ,
+Petal.Length = 5.2 , Petal.Width=2.0
+)
+model %>% predict(newdata, "class")
+# Load the data and remove NAs
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit (PimaIndiansDiabetes2)
+# Inspect the data
+sample_n(PimaIndiansDiabetes2, 3)
+# Split the data into training and test set
+set.seed (123)
+training.samples <- PimaIndiansDiabetes2$diabetes %>%
+createDataPartition(p = 0.8, list = FALSE)
+train.data <- PimaIndiansDiabetes2[training.samples, ]
+test.data <- PimaIndiansDiabetes2[-training.samples, ]
+# Build the model
+set.seed(123)
+model1 <- rpart(diabetes ~., data = train.data, method = "class")
+# Plot the trees
+par(xpd = NA) # Avoid clipping the text in some device
+plot (model1)
+text (model1, digits = 3)
+
+# Make predictions on the test data
+predicted.classes <- model1 %>%
+predict(test.data, type = "class")
+head (predicted.classes)
+# Compute model accuracy rate on test data
+mean(predicted.classes == test.data$diabetes)
+# Fit the model on the training set
+set.seed (123)
+model2 <- train(
+diabetes ~., data = train.data, method = "rpart",
+trControl = trainControl("cv", number = 10),
+tuneLength = 10
+)
+# Plot model accuracy vs different values of
+# cp (complexity parameter)
+plot (model2)
+# Print the best tuning parameter cp that
+# maximizes the model accuracy
+model2$bestTune
+# Plot the final tree model
+par(xpd = NA) # Avoid clipping the text in some device
+plot (model2$finalModel)
+text(model2$finalModel, digits = 3)
+#Decision rules in the model
+model2$finalModel
+# Make predictions on the test data
+predicted.classes <- model2 %>% predict (test.data)
+# Compute model accuracy rate on test data
+mean(predicted.classes == test.data$diabetes)
+# Load the data
+data("Boston", package = "MASS")
+# Inspect the data
+sample_n(Boston, 3)
+# Split the data into training and test set
+set.seed(123)
+training.samples <- Boston$medv %>%
+createDataPartition(p = 0.8, list = FALSE)
+train.data <- Boston[training.samples, ]
+test.data <- Boston[-training.samples, ]
+# Fit the model on the training set
+set.seed (123)
+model <- train(
+medv ~., data = train.data, method = "rpart",
+trControl = trainControl("cv", number = 10),
+tuneLength = 10
+)
+# Plot model error vs different values of
+# cp (complexity parameter)
+plot (model)
+# Print the best tuning parameter cp that
+# minimize the model RMSE
+model$bestTune
+# Plot the final tree model
+par(xpd = NA) # Avoid clipping the text in some device 
+plot (model$finalModel)
+text (model$finalModel, digits = 3)
+# Decision rules in the model
+model$finalModel
+# Make predictions on the test data
+predictions <- model %>% predict (test.data)
+head (predictions)
+# Compute the prediction error RMSE
+RMSE (predictions, test.data$medv)
+# Load the data
+data("PimaIndiansDiabetes2", package = "mlbench")
+pima.data <- na.omit (PimaIndiansDiabetes2)
+# Split the data into training and test set
+set.seed (123)
+training.samples <- pima.data$diabetes %>%
+createDataPartition(p = 0.8, list = FALSE)
+train.data <- pima.data[training.samples, ]
+test.data <- pima.data[-training.samples, ]
+library (party)
+set.seed (123)
+model <- train(
+diabetes ~., data = train.data, method = "ctree2",
+trControl = trainControl("cv", number = 10),
+tuneGrid = expand.grid(maxdepth = 3, mincriterion = 0.95 )
+)
+plot (model$finalModel)
+# Make predictions on the test data
+predicted.classes <- model %>% predict (test.data)
+# Compute model accuracy rate on test data
+mean(predicted.classes == test.data$diabetes)
+
+
+#-------------------------------------------------------------------------------
+#Chapter33: Bagging and Random Forest
+
+library (tidyverse)
+library (caret)
+library (randomForest)
+#Load the data AND remove NAs
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit(PimaIndiansDiabetes2)
+# Inspect the data
+sample_n(PimaIndiansDiabetes2, 3)
+# Split the data into training and test set
+set.seed(123)
+training.samples <- PimaIndiansDiabetes2$ diabetes %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- PimaIndiansDiabetes2 [training.samples, ]
+test.data <- PimaIndiansDiabetes2 [-training.samples, ]
+# Fit the model on the training set 
+set.seed(123) 
+model <- train(
+diabetes ~., data = train.data, method = "rf",
+trControl = trainControl("cv", number = 10),
+importance = TRUE
+)
+#Best tuning parameter
+model$bestTune
+#Final model
+model$finalModel
+# Make predictions on the test data 
+predicted.classes <- model %>% predict (test.data)
+head(predicted.classes)
+# Compute model accuracy rate
+mean(predicted.classes == test.data$diabetes)
+importance(model$finalModel)
+# Plot MeanDecreaseAccuracy
+varImpPlot (model$finalModel, type=1)
+# Plot MeanDecreaseGint
+varImpPlot (model$finalModel, type=2)
+varImp(model)
+# Load the data
+data("Boston", package = "MASS")
+# Inspect the data
+sample_n(Boston, 3)
+# Split the data into training and test set
+set.seed (123) 
+training.samples <- Boston$medv %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data <- Boston[training.samples, ]
+test.data <- Boston[-training.samples, ]
+# Fit the model on the training set
+set.seed (123)
+model <- train(
+medv ~., data = train.data, method = "rf",
+trControl = trainControl("cv", number = 10)
+)
+# Best tuning parameter mtry
+model$bestTune
+# Make predictions on the test data
+predictions <- model %>% predict (test.data)
+head(predictions)
+# Compute the average prediction error RMSE
+RMSE(predictions, test.data$medv)
+data("PimaIndiansDiabetes2", package = "mlbench")
+models <- list()
+for (nodesize in c(1, 2, 4, 8)) {
+set.seed(123)
+model <- train(
+diabetes~., data = na.omit(PimaIndiansDiabetes2), method="rf",
+trControl = trainControl(method="cv", number=10) ,
+metric = "Accuracy",
+nodesize = nodesize
+)
+model.name <- toString (nodesize)
+models [[model.name]] <- model
+}
+# Compare results
+resamples(models) %>% summary(metric = "Accuracy")
+
+#-------------------------------------------------------------------------------
+#Chapter34: Boosting
+
+library (tidyverse)
+library (caret)
+library (xgboost)
+#Load the data AND remove NAs
+data("PimaIndiansDiabetes2", package = "mlbench")
+PimaIndiansDiabetes2 <- na.omit(PimaIndiansDiabetes2)
+# Inspect the data
+sample_n(PimaIndiansDiabetes2, 3)
+# Split the data into training and test set
+set.seed(123)
+training.samples <- PimaIndiansDiabetes2$ diabetes %>%
+	createDataPartition(p = 0.8, list = FALSE)
+train.data <- PimaIndiansDiabetes2 [training.samples, ]
+test.data <- PimaIndiansDiabetes2 [-training.samples, ]
+# Fit the model on the training set 
+set.seed(123) 
+model <- train(
+diabetes ~., data = train.data, method = "xgbTree",
+trControl = trainControl("cv", number = 10),
+)
+#Best tuning parameter
+model$bestTune
+# Make predictions on the test data 
+predicted.classes <- model %>% predict (test.data)
+head(predicted.classes)
+# Compute model prediction accuracy rate
+mean(predicted.classes == test.data$diabetes)
+varImp(model)
+# Load the data
+data("Boston", package = "MASS")
+# Inspect the data
+sample_n(Boston, 3)
+# Split the data into training and test set
+set.seed(123)
+training.samples <- Boston$medv %>%
+createDataPartition(p = 0.8, list = FALSE)
+train.data <- Boston[training.samples, ]
+test.data <- Boston[-training.samples, ]
+# Fit the model on the training set
+set.seed (123)
+model <- train(
+medv ~., data = train.data, method = "xgbTree",
+trControl = trainControl("cv", number = 10)
+)
+# Best tuning parameter mtry
+model$bestTune
+# Make predictions on the test data
+predictions <- model %>% predict (test.data)
+head(predictions)
+# Compute the average prediction error RMSE
+RMSE(predictions, test.data$medv)
+
+
+#-------------------------------------------------------------------------------
+#VIII Unsupervised Learning
+#Chapter35: Unsupervised Learning
+
+library (FactoMineR)
+library (factoextra)
+data("USArrests")
+res.pca <- PCA(USArrests, graph = FALSE)
+fviz_eig(res.pca)
+fviz_pca_ind(res.pca, repel = TRUE)
+fviz_pca_var(res.pca)
+fviz_pca_biplot(res.pca, repel = TRUE)
+# Eigenvalues
+res.pca$eig
+# Results for Variables
+res.var <- res.pca$var
+res.var$coord # Coordinates
+res.var$contrib # Contributions to the PCs
+res.var$cos2 # Quality of representation
+# Results for individuals
+res.ind <- res.pca$var
+res.ind$coord # Coordinates
+res.ind$contrib # Contributions to the PCs
+res.ind$cos2 # Quality of representation
+# Load and inspect the data set
+data("housetasks")
+head(housetasks, 4)
+# Compute correspondence analysis
+res.ca <- CA(housetasks, graph = FALSE)
+fviz_ca_biplot(res.ca, repel = TRUE)
+# Load data
+data("poison")
+head(poison[, 1:8], 4)
+# Compute multiple correspondence analysis:
+res.mca <- MCA(poison, quanti.sup = 1:2,
+quali.sup = 3:4, graph=FALSE)
+# Graph of individuals, colored by groups ("Sick")
+fviz_mca_ind(res.mca, repel = TRUE, habillage = "Sick",
+addEllipses = TRUE)
+# Graph of variable categories
+fviz_mca_var(res.mca, repel = TRUE)
+fviz_mca_biplot(res.mca, repel = TRUE,
+ggtheme=theme_minimal())
+library (cluster)
+library (factoextra)
+mydata <- scale(USArrests)
+fviz_nbclust(mydata,kmeans,method="gap_stat")
+set.seed(123) # for reproducibility
+km.res <- kmeans(mydata, 3, nstart = 25)
+# Visualize
+fviz_cluster(km.res, data = mydata, palette = "jco",
+ggtheme = theme_minimal())
+pam.res <- pam(mydata, 3)
+fviz_cluster (pam.res)
+res.hc <- hclust (dist (mydata), method ="ward.D2")
+fviz_dend(res.hc, cex = 0.5, k = 4, palette = "jco")
+library (pheatmap)
+pheatmap(t(mydata), cutree_cols = 4)
+
